@@ -1,0 +1,71 @@
+<div class="row-fluid">
+
+  <div class="span3">
+    <div style="margin-bottom: 10px;">
+      <button id="btn-new-session" type="button" class="btn btn-small">New Session</button>
+    </div>
+    <div class="well">
+      <form ng-submit="add()">
+        <fieldset>
+          <legend>Session Info</legend>
+          <label>Location:</label>
+          <input ng-model="location" id="location" name="location" type="text" placeholder="">
+          <select ng-model="location" ng-options="obj.location for obj in locations">
+            <option value="">-- location --</option>
+          </select>
+          <label>Game:</label>
+          <input ng-model="game" id="game" name="game" type="text" placeholder="">
+          <label>Start Time:</label>
+          <input ng-model="start_time" id="start_time" name="start_time" type="text" placeholder="MM/DD/YYYY 00:00:00">
+          <label>Buy In:</label>
+          <div class="input-prepend">
+            <span class="add-on">$</span>
+            <input ng-model="buyin" id="buyin" name="buyin" class="input-small" type="number" type="text" placeholder="">
+          </div>
+          <hr />
+          <label>End Time:</label>
+          <input ng-model="end_time" id="end_time" name="end_time" type="text" placeholder="MM/DD/YYYY 00:00:00">
+          <label>Cash Out:</label>
+          <div class="input-prepend">
+            <span class="add-on">$</span>
+            <input ng-model="cashout" id="cashout" name="cashout" class="input-small" type="number" type="text" placeholder="">
+          </div>
+          <div class="pull-right">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn">Clear</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div><!--/span-->
+
+  <div class="span9">
+    <legend>My Sessions</legend>
+    <table id="table-sessions" class="table">
+      <thead>
+        <tr>
+          <th>Location</th>
+          <th>Start Time</th>
+          <th>Game</th>
+          <th style="text-align:right">Total Buy In</th>
+          <th style="text-align:right">Total Cash Out</th>
+          <th style="text-align:right">Win/Loss</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="session in sessions">
+          <td>{{session.location}}</td>
+          <td>{{session.start_time}}</td>
+          <td>{{session.game}}</td>
+          <td style="text-align:right;">
+          - {{session.buyin_total | currency}} 
+          <a href="#" class="list-buyins" title="List Buyins"><i class="icon-list-alt"></i></a>
+          </td>
+          <td style="text-align:right">{{session.cashout | currency}}</td>
+          <td style="text-align:right">{{session.cashout - session.buyin_total | currency}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div><!--/span-->
+
+</div><!--/row-->
