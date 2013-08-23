@@ -5,6 +5,7 @@ use RedBean_Facade as R;
 class Model
 {
   // Bean Constants
+  const USER_BEAN = 'user';
   const SESSION_BEAN = 'session';
   const BUYIN_BEAN = 'buyin';
 
@@ -15,11 +16,26 @@ class Model
     R::setup();
   }
 
+  public function getAuthUser($u, $p)
+  {
+    $q = ' username = :u password = :p';
+    $params = array(
+      ':u' => $u,
+      ':p' => $p
+    );
+    $result = R::findOne(self::USER_BEAN, $q, $params);
+    return $result;
+  }
+
   public function getLocations()
   {
     $q = 'SELECT location FROM ' . self::SESSION_BEAN;
-    $rows = R::getAll($q);
-    return $rows;
+    $result = R::getAll($q);
+    $aLocations = array();
+    foreach ($result as $row) {
+      $aLocations[] = $row['location'];
+    }
+    return $aLocations;
   }
 
   public function getGames()
@@ -40,6 +56,7 @@ class Model
     $a = array();
     foreach ($result as $session) {
       $obj = new stdClass();
+      $obj->id = $session->id;
       $obj->location = $session->location;
       $obj->game = $session->game;
       $obj->start_time = $session->start_time;
@@ -61,44 +78,56 @@ class Model
     $session->buyin_total = 0;
     $session->cashout = $value->cashout;
 
-    //R::store($session);
+    $session_id = R::store($session);
 
     if( isset($value->buyins) ) {
       foreach($value->buyins as $buyin) {
-        $buyinBean = saveBuyin($buyin);
-        $session->ownBuyin[] = $buyinBean;
+        $buyinBean = $this->saveBuyin($session_id, $buyin);
       }
     }
-
-    $session->buyin_total = $this->calcSessionBuyinTotal($session);
-
-    R::store($session);
+    //we need an updated copy after the total has been added
+    $session = R::load(self::SESSION_BEAN, $session_id);
     return $session;
   }
 
-  protected function calcSessionBuyinTotal($session)
+  protected function updateSessionBuyinTotal($session_id)
   {
-    $total = 0;
-    foreach($session->ownBuyin as $buyin) {
-      $total += $buyin->amount;
+    $session = R::load(self::SESSION_BEAN, $session_id);
+
+    $buyins = $this->getBuyins($session->id);
+    $newTotal = 0;
+    foreach($buyins as $buyin) {
+      $newTotal += $buyin->amount;
     }
-    return $total;
+
+    $session->buyin_total = $newTotal;
+    R::store($session);
   }
 
-  public function saveBuyin($value)
+  public function saveBuyin($session_id, $value)
   {
-    $session = R::load(self::SESSION_BEAN, $value->session_id);
-
+    //save this buyin associated with the session
     $buyin = R::dispense(self::BUYIN_BEAN);
+    $buyin->session_id = $session_id;
     $buyin->amount = $value->amount;
+    R::store($buyin);
 
-    //R::store($buyin);
+    $this->updateSessionBuyinTotal($session_id);
 
     return $buyin;
   }
 
   public function getBuyins($session_id) {
-    $session = R::load(self::SESSION_BEAN, $value->session_id);
-    return $session->ownBuyin;
+    $result = R::findAll(
+      self::BUYIN_BEAN,
+      'WHERE session_id = ' . $session_id);
+    $a = array();
+    foreach ($result as $buyin) {
+      $obj = new stdClass();
+      $obj->id = $buyin->id;
+      $obj->amount = $buyin->amount;
+      $a[] = $obj;
+    }
+    return $a;
   }
 }

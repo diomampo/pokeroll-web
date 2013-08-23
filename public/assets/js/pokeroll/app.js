@@ -1,4 +1,4 @@
-var app = angular.module('pokeroll',[])
+var app = angular.module('pokeroll',['ngResource'])
   .config(function($routeProvider, $locationProvider) {
 
   //init routes
@@ -27,3 +27,5 @@ app.value('configuration', function(){
 app.controller('MainController', function($scope) {
 
 });
+
+

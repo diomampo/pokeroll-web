@@ -1,26 +1,32 @@
-app.controller('SessionsController', function($scope, $http) {
+app.controller('SessionsController', function($scope, SessionsService, LocationsService) {
 
-  $http.get('api/sessions').success(function(data){
-    $scope.sessions = data;
-  });
+  /*
+    A value object that we can bind to
+    within our templates.
+  */
+  $scope.session = {};
 
-  $http.get('api/locations').success(function(data){
-    $scope.locations = data;
-  });
+  /*
+    A collection of value objects used when binding.
+    In this case the data is coming from our SessionsService,
+    which is injected. This will make it nice and reusable
+    inside other controllers.
+  */
+  $scope.sessions = SessionsService.query();
 
-  $scope.add = function() {
-    var item = {
-      location: $scope.location,
-      game:$scope.game,
-      start_time:$scope.start_time,
-      buyins: [{amount:$scope.buyin}],
-      end_time:$scope.end_time,
-      cashout:$scope.cashout
-    };
-    $http.post('api/sessions', item)
-      .success(function(data){
-        $scope.sessions.push(data);
-      }
-    );
+  $scope.locations = LocationsService.query();
+
+  $scope.add = function(item) {
+    
+    //This is interesting because we need to send
+    //a list of buyins, but I have no clue how to
+    //setup the ng-model for this type of structure.
+    item.buyins = [{amount:item.buyin}];
+
+    //Our REST API returns the saved object on post
+    SessionsService.save(item, function(data){
+      $scope.sessions.push(data);
+    });
+
   };
 });

@@ -6,7 +6,10 @@
   <base href="/pokeroll-web/public/"/>
 
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js"></script>
   <script src="assets/js/pokeroll/app.js"></script>
+  <script src="assets/js/pokeroll/services.js"></script>
+  <script src="assets/js/pokeroll/directives.js"></script>
   <script src="assets/js/pokeroll/sessions/SessionsController.js"></script>
 </head>
 

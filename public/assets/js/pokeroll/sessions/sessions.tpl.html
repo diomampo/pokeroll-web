@@ -5,30 +5,27 @@
       <button id="btn-new-session" type="button" class="btn btn-small">New Session</button>
     </div>
     <div class="well">
-      <form ng-submit="add()">
+      <form ng-submit="add(session)">
         <fieldset>
           <legend>Session Info</legend>
           <label>Location:</label>
-          <input ng-model="location" id="location" name="location" type="text" placeholder="">
-          <select ng-model="location" ng-options="obj.location for obj in locations">
-            <option value="">-- location --</option>
-          </select>
+          <input ng-model="session.location" dio-autocomplete dio-autocomplete-dataprovider="locations" dio-autocomplete-source="session.location" id="location" name="location" type="text" placeholder="">
           <label>Game:</label>
-          <input ng-model="game" id="game" name="game" type="text" placeholder="">
+          <input ng-model="session.game" id="game" name="game" type="text" placeholder="">
           <label>Start Time:</label>
-          <input ng-model="start_time" id="start_time" name="start_time" type="text" placeholder="MM/DD/YYYY 00:00:00">
+          <input ng-model="session.start_time" id="start_time" name="start_time" type="text" placeholder="MM/DD/YYYY 00:00:00">
           <label>Buy In:</label>
           <div class="input-prepend">
             <span class="add-on">$</span>
-            <input ng-model="buyin" id="buyin" name="buyin" class="input-small" type="number" type="text" placeholder="">
+            <input ng-model="session.buyin" id="buyin" name="buyin" class="input-small" type="number" type="text" placeholder="">
           </div>
           <hr />
           <label>End Time:</label>
-          <input ng-model="end_time" id="end_time" name="end_time" type="text" placeholder="MM/DD/YYYY 00:00:00">
+          <input ng-model="session.end_time" id="end_time" name="end_time" type="text" placeholder="MM/DD/YYYY 00:00:00">
           <label>Cash Out:</label>
           <div class="input-prepend">
             <span class="add-on">$</span>
-            <input ng-model="cashout" id="cashout" name="cashout" class="input-small" type="number" type="text" placeholder="">
+            <input ng-model="session.cashout" id="cashout" name="cashout" class="input-small" type="number" type="text" placeholder="">
           </div>
           <div class="pull-right">
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -58,8 +55,7 @@
           <td>{{session.start_time}}</td>
           <td>{{session.game}}</td>
           <td style="text-align:right;">
-          - {{session.buyin_total | currency}} 
-          <a href="#" class="list-buyins" title="List Buyins"><i class="icon-list-alt"></i></a>
+          - {{session.buyin_total | currency}} <a href="#" class="dio-widget-buyinlist" session-id="{{session.id}}" title="Show Buyins"><i class="icon-list-alt"></i></a>
           </td>
           <td style="text-align:right">{{session.cashout | currency}}</td>
           <td style="text-align:right">{{session.cashout - session.buyin_total | currency}}</td>

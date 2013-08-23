@@ -19,7 +19,24 @@ $app->get('/',
 
 // API-specific routes
 
-$app->get('/api/games/', 
+$app->post('/api/login', 
+  function() use($app, $m){
+    $req = $app->request();
+    $u = $req->post('u');
+    $p = $req->post('p');
+    if( ! is_null($m->getAuthUser($u, $p)) ){
+      $response = $app->response();
+      $response['Content-Type'] = 'application/json';
+      $response->status(200);
+      $response->body( 'Access Granted' );
+    }
+    else{
+      //403
+      $app->halt(403, 'Access Denied.');
+    }
+});
+
+$app->get('/api/games', 
   function() use($app, $m) {
     return $m->getGames();
   }
@@ -35,8 +52,8 @@ $app->get('/api/locations/',
   }
 );
 
-$app->map('/api/sessions/',
-  function() use($app, $m) {
+$app->map('/api/sessions(/:sessionId)',
+  function($sessionId=null) use($app, $m) {
     $req = $app->request();
 
     if( $req->isGet() ) {
@@ -66,6 +83,18 @@ $app->map('/api/sessions/',
     }
     elseif( $req->isDelete() ) {
       //@todo
+    }
+  }
+)->via('GET', 'POST', 'PUT', 'DELETE');
+
+$app->map('/api/sessions/:sessionId/buyins(/:buyinId)', 
+  function($sessionId, $buyinId=null) use ($app, $m){
+    $req = $app->request();
+    if( $req->isGet() ){
+      $response = $app->response();
+      $response['Content-Type'] = 'application/json';
+      $response->status(200);
+      $response->body( json_encode($m->getBuyins($sessionId)) );
     }
   }
 )->via('GET', 'POST', 'PUT', 'DELETE');
